@@ -1,6 +1,9 @@
 function CreateVillain()
   Villain = {}
-  Villain.sprite = love.graphics.newImage "villain.png"
+  --Villain.sprite = love.graphics.newImage "villain.png"
+  Villain.number = 0
+  Villain.count = 0
+  Villain.sprite = love.graphics.newImage "knight_00.png"
   Villain.width = Villain.sprite:getWidth()
   Villain.height = Villain.sprite:getHeight()
   Villain.speed = 100
@@ -17,5 +20,19 @@ function DrawVillain()
 end
 
 function MoveVillain(dt)
+  if (Villain.count > 10) then
+    if Villain.number == 0 or Villain.number == 3 then
+       Villain.number = 1
+       Villain.sprite = love.graphics.newImage "knight_01.png"
+    elseif Villain.number == 1 then
+       Villain.number = 2
+       Villain.sprite = love.graphics.newImage "knight_02.png"
+    elseif Villain.number == 2 then
+       Villain.number = 3
+       Villain.sprite = love.graphics.newImage "knight_03.png"
+    end
+    Villain.count = 0;
+  end
+  Villain.count = Villain.count + 1;
   Villain.x = Villain.x - Villain.speed * dt
 end
