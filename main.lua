@@ -1,12 +1,9 @@
 Width = love.graphics.getWidth()
 Height = love.graphics.getHeight()
 StartDuel = false
-State = "Play"
-button = {}
-medium = love.graphics.newFont(45)
-background = love.graphics.newImage("joust.jpg")
-
-BgSound = love.audio.newSource("encore.mp3", "stream")
+State = "Menu"
+background = love.graphics.newImage("images/backgrounds/joust.jpg")
+BgSound = love.audio.newSource("sounds/encore.mp3", "stream")
 --set the volume of the sound
 --BgSound:setVolume(0.5)
 --set the pitch level
@@ -15,82 +12,71 @@ BgSound = love.audio.newSource("encore.mp3", "stream")
 
 function love.load(arg)
   --imports
-  if State == "Menu" then
-    ButtonSpawn(Width - 300, Height - 220, "START GAME", "start")
-    ButtonSpawn(Width - 260, Height - 150, "OPTIONS", "options")
-    ButtonSpawn(Width - 200, Height - 80, "EXIT", "exit")
-  end
-  if State == "Play" then
+  --if State == "Menu" then
+
+  --elseif State == "Play" then
+    mouse = require "mouse"
     hero = require "hero"
     villain = require "villain"
     stage = require "stage"
+    love.keyboard.setKeyRepeat(0.2, 0.3)
     --Load classes
+    CreateButton()
     CreateHero()
     CreateVillain()
     CreateStage()
-  end
+  --end
 end
 
 function love.update(dt)
+  --  State = "Play"
   if State == "Menu" then
-
-  end
-  if State == "Options" then
-  end
-  if State == "Play" then
+    MouseCheck()
+  elseif State == "Options" then
+    --
+  elseif State == "Play" then
     if not StartDuel and love.keyboard.isDown("space") then
       StartDuel = true;
-    end;
-    if StartDuel then
+    elseif StartDuel then
       MoveHero(dt)
       MoveVillain(dt)
     end
-    if Hero.x >= Width / 2 - Hero.width then
-      love.audio.play(BgSound)
-    end
+  elseif State == "Exit" then
+    love.event.quit(0)
   end
+
+  -- if Hero.x >= Width / 2 - Hero.width then
+  --   love.audio.play(BgSound)
+  -- end
 end
 
 function love.draw()
+  ResetFont()
   if State == "Menu" then
     love.graphics.draw(background)
-    --love.graphics.setColor(255, 255, 255)
-    --love.graphics.print("Screen-> Width: "..Width.." Height: "..Height)
     ButtonDraw()
-  end
-  if State == "Options" then
-
-  end
-  if State == "Play" then
+  elseif State == "Options" then
+    --
+  elseif State == "Play" then
+    ResetFont()
     DrawStageBackground()
     DrawScreenStatistics()
     DrawVillain()
     DrawStageFence(Width, Height)
     DrawHero()
+    SetLance()
+    SetShield()
   end
 end
 
 function DrawScreenStatistics()
   love.graphics.setColor(255, 255, 255)
   --love.graphics.print("Screen-> Width: "..Width.." Height: "..Height)
-  --love.graphics.line(Width / 2, 0, Width / 2, Height)
+  love.graphics.line(Width / 2, 0, Width / 2, Height)
 end
 
-function ButtonSpawn(x, y, text, id)
-  table.insert(button, {x = x, y = y, text = text, mouseover = false} )
-end
-
-function ButtonDraw()
-  love.graphics.setFont(medium)
-  for i, v in ipairs(button) do
-     love.graphics.print(v.text, v.x, v.y)
-  end
----if mouse is not on button, the color should be black
-  --if v.mousover == false then
-  --   love.graphics.setColor(0,0,0)
-  -- end
----if mouse is on button
-  -- if v.mousover == true then
-  --   love.graphics.setColor(0,252,252)
-  -- end
+function ResetFont()
+  normal = love.graphics.newFont(14)
+  love.graphics.setFont(normal)
+  love.graphics.setColor(255, 255, 255)
 end
