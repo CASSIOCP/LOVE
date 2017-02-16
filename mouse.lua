@@ -33,7 +33,7 @@ function MouseCheck()
 end
 
 function ButtonDraw()
-  love.graphics.setFont(medium)
+  love.graphics.setFont(medium)  
   for i, v in ipairs(Button) do
     if v.mouseOver then
       if love.keyboard.isDown("x") then
