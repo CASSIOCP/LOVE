@@ -92,7 +92,7 @@ function MoveHero(dt)
 end
 
 function ReachCenter()
-  return Hero.x >= Width / 1.8
+  return Hero.x + Hero.width >= Width / 2.5
 end
 
 function HeroShieldPosition()

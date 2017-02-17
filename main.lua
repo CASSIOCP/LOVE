@@ -20,6 +20,10 @@ function love.load(arg)
   Cloud.currentSprite = 1
   Cloud.count = 0
   Cloud.NeedDraw = true
+
+  timer = 10
+  startTime = love.timer.getTime()
+  medium = love.graphics.newFont(45)
   venceu = ""
 
   --imports
@@ -47,7 +51,8 @@ function love.update(dt)
   elseif State == "Options" then
     --
   elseif State == "Play" then
-    if not StartDuel and love.keyboard.isDown("space") then
+    MoveClouds(dt)
+    if not StartDuel and (love.keyboard.isDown("space") or (love.timer.getTime() - startTime >= 10)) then
       StartDuel = true;
     elseif StartDuel then
       MoveHero(dt)
@@ -95,13 +100,24 @@ function love.draw()
     DrawScreenStatistics()
     DrawVillain()
     DrawStageFence(Width, Height)
+    love.graphics.setColor(255, 255, 0)
+    love.graphics.rectangle("fill", Width / 2, Height / 1.295, 15, 8)
     DrawHero()
     if ReachCenter() and Cloud.NeedDraw then
+      love.graphics.draw(Cloud.sprite[Cloud.currentSprite], Width / 3.5, Height / 3)
       love.graphics.draw(Cloud.sprite[Cloud.currentSprite], Width / 4, Height / 3)
+      love.graphics.draw(Cloud.sprite[Cloud.currentSprite], Width / 4.5, Height / 3)
     end
     if ReachCenter() then
       love.graphics.print(venceu, Width / 4, 10)
     end
+    love.graphics.setColor(0, 0, 0)
+    love.graphics.setFont(medium)
+    if (love.timer.getTime() - startTime) <= 10 then
+      result = string.format( "Tempo: %.2d", (10 - (love.timer.getTime() - startTime)))
+      love.graphics.print(result, 500, 100)
+    end
+
   end
   --love.graphics.draw(button1, Width - 300, Height - 220)
   --love.graphics.draw(button2, Width - 300, Height - 150)
@@ -110,7 +126,7 @@ end
 function DrawScreenStatistics()
   love.graphics.setColor(255, 255, 255)
   --love.graphics.print("Screen-> Width: "..Width.." Height: "..Height)
-  love.graphics.line(Width / 2, 0, Width / 2, Height)
+  --love.graphics.line(Width / 2, 0, Width / 2, Height)
 end
 
 function ResetFont()

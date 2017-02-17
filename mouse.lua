@@ -12,6 +12,7 @@ function ButtonClick(id)
   if love.mouse.isDown("1") then
     if id == "start" then
       State = "Play"
+      startTime = love.timer.getTime()
     elseif id == "options" then
       State = "Options"
     elseif id == "exit" then
@@ -33,7 +34,7 @@ function MouseCheck()
 end
 
 function ButtonDraw()
-  love.graphics.setFont(medium)  
+  love.graphics.setFont(medium)
   for i, v in ipairs(Button) do
     if v.mouseOver then
       if love.keyboard.isDown("x") then
