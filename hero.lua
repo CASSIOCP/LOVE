@@ -71,6 +71,7 @@ end
 function MoveHero(dt)
   if Hero.enableMovements then
     if  Hero.count == 10 then
+      Galop:play()
       if Hero.currentSprite == 1 or Hero.currentSprite == 4 then
          Hero.currentSprite = 2
       elseif Hero.currentSprite == 2 then
@@ -87,6 +88,11 @@ function MoveHero(dt)
       Hero.currentLanceSprite = 4
       Hero.currentShieldSprite = 2
       Hero.currentSprite = 1
+      if not finish then
+        Ost:stop()
+        VictorySound:play()
+        finish = true
+      end
     end
   end
 end

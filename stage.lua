@@ -16,6 +16,16 @@ function CreateStage()
   table.insert(Stage.flagPosition, { x = 685, y = 005, count = 4, currentImage = 1} )
   table.insert(Stage.flagPosition, { x = 935, y = 140, count = 7, currentImage = 1} )
 
+  Stage.dust = {}
+  Stage.dust.sprite = {}
+  table.insert(Stage.dust.sprite, love.graphics.newImage "images/elements/dust_01.png")
+  table.insert(Stage.dust.sprite, love.graphics.newImage "images/elements/dust_02.png")
+  table.insert(Stage.dust.sprite, love.graphics.newImage "images/elements/dust_03.png")
+  table.insert(Stage.dust.sprite, love.graphics.newImage "images/elements/dust_04.png")
+  Stage.dust.currentSprite = 1
+  Stage.dust.count = 0
+  Stage.dust.NeedDraw = true
+
   Stage.castle = love.graphics.newImage("images/backgrounds/castle.png")
   Stage.shadowFence = love.graphics.newImage("images/elements/shadow_fence.png")
   Stage.fence = love.graphics.newImage("images/elements/fence.png")

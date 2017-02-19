@@ -1,17 +1,34 @@
-Button = {}
-
 function CreateButton()
-  ButtonSpawn(Width - 300, Height - 220, "START GAME", "start")
-  ButtonSpawn(Width - 260, Height - 150, "OPTIONS", "options")
-  ButtonSpawn(Width - 200, Height - 80, "EXIT", "exit")
+  Button = {}
+  ButtonSpawn(Width - 350, Height - 220, "START GAME", "start")
+  ButtonSpawn(Width - 310, Height - 150, "OPTIONS", "options")
+  ButtonSpawn(Width - 250, Height - 80, "EXIT", "exit")
 end
 
-medium = love.graphics.newFont(45)
+function CreateButtonName()
+  Button = {}
+  ButtonSpawn(Width - 200, Height / 2, "OK", "ok1")
+end
+
+function CreateButtonLetter()
+  Button = {}
+  ButtonSpawn(Width - 200, Height - 100, "OK", "ok2")
+end
 
 function ButtonClick(id)
   if love.mouse.isDown("1") then
+    MetalSound:play()
+    --love.audio.stop()
     if id == "start" then
+      State = "Name"
+      CreateButtonName()
+    elseif id == "ok1" then
+      State = "Story"
+      CreateButtonLetter()
+    elseif id == "ok2" then
       State = "Play"
+      BgSound:stop()
+      Ost:play()
       startTime = love.timer.getTime()
     elseif id == "options" then
       State = "Options"
@@ -23,8 +40,8 @@ end
 
 function MouseCheck()
   for i, v in ipairs(Button) do
-    if love.mouse.getX() > v.x and love.mouse.getX() < v.x + medium:getWidth(v.text) and
-       love.mouse.getY() > v.y and love.mouse.getY() < v.y + medium:getHeight(v.text) then
+    if love.mouse.getX() > v.x and love.mouse.getX() < v.x + mainFont:getWidth(v.text) and
+       love.mouse.getY() > v.y and love.mouse.getY() < v.y + mainFont:getHeight(v.text) then
       v.mouseOver = true
       ButtonClick(v.id)
     else
@@ -34,18 +51,13 @@ function MouseCheck()
 end
 
 function ButtonDraw()
-  love.graphics.setFont(medium)
+  love.graphics.setFont(mainFont)
   for i, v in ipairs(Button) do
     if v.mouseOver then
-      if love.keyboard.isDown("x") then
-        love.graphics.print("sim", 0, 100)
-      end
-      love.graphics.print("id: "..v.id, 0, 0)
       love.graphics.setColor(255, 255, 255)
     else
       love.graphics.setColor(0, 0, 0)
     end
-
     love.graphics.print(v.text, v.x, v.y)
   end
 end
