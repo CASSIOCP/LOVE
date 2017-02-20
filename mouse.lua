@@ -1,24 +1,25 @@
 function CreateButton()
   Button = {}
-  ButtonSpawn(Width - 350, Height - 220, "START GAME", "start")
-  ButtonSpawn(Width - 310, Height - 150, "OPTIONS", "options")
-  ButtonSpawn(Width - 250, Height - 80, "EXIT", "exit")
+
+  table.insert(Button, { x = 400, y = 600, id = "start", mouseOver = false, spriteNormal = love.graphics.newImage "images/buttons/player_01.png", spriteOver = love.graphics.newImage "images/buttons/player_02.png" } )
+  table.insert(Button, { x = 400, y = 680, id = "multiplayer", mouseOver = false, spriteNormal = love.graphics.newImage "images/buttons/multiplayer_01.png", spriteOver = love.graphics.newImage "images/buttons/multiplayer_02.png"} )
+  table.insert(Button, { x = 750, y = 600, id = "tutorial", mouseOver = false, spriteNormal = love.graphics.newImage "images/buttons/tutorial_01.png", spriteOver = love.graphics.newImage "images/buttons/tutorial_02.png" } )
+  table.insert(Button, { x = 750, y = 680, id = "credits", mouseOver = false, spriteNormal = love.graphics.newImage "images/buttons/credits_01.png", spriteOver = love.graphics.newImage "images/buttons/credits_02.png" } )
 end
 
 function CreateButtonName()
   Button = {}
-  ButtonSpawn(Width - 200, Height / 2, "OK", "ok1")
+  table.insert(Button, { x = Width - 300, y = Height / 2 - 30, id = "ok1", mouseOver = false, spriteNormal = love.graphics.newImage "images/buttons/ok_01.png", spriteOver = love.graphics.newImage "images/buttons/ok_02.png" } )
 end
 
 function CreateButtonLetter()
   Button = {}
-  ButtonSpawn(Width - 200, Height - 100, "OK", "ok2")
+  table.insert(Button, { x = Width - 200, y = Height - 100, id = "ok2", mouseOver = false, spriteNormal = love.graphics.newImage "images/buttons/ok_01.png", spriteOver = love.graphics.newImage "images/buttons/ok_02.png" } )
 end
 
 function ButtonClick(id)
   if love.mouse.isDown("1") then
     MetalSound:play()
-    --love.audio.stop()
     if id == "start" then
       State = "Name"
       CreateButtonName()
@@ -28,10 +29,11 @@ function ButtonClick(id)
     elseif id == "ok2" then
       State = "Play"
       BgSound:stop()
-      Ost:play()
+      --Ost:play()
       startTime = love.timer.getTime()
-    elseif id == "options" then
-      State = "Options"
+    elseif id == "multiplayer" then
+      id = "ok2"
+      Multiplayer = true
     elseif id == "exit" then
       State = "Exit"
     end
@@ -40,8 +42,8 @@ end
 
 function MouseCheck()
   for i, v in ipairs(Button) do
-    if love.mouse.getX() > v.x and love.mouse.getX() < v.x + mainFont:getWidth(v.text) and
-       love.mouse.getY() > v.y and love.mouse.getY() < v.y + mainFont:getHeight(v.text) then
+    if love.mouse.getX() > v.x and love.mouse.getX() < v.x + v.spriteNormal:getWidth() and
+       love.mouse.getY() > v.y and love.mouse.getY() < v.y + v.spriteNormal:getHeight() then
       v.mouseOver = true
       ButtonClick(v.id)
     else
@@ -51,17 +53,12 @@ function MouseCheck()
 end
 
 function ButtonDraw()
-  love.graphics.setFont(mainFont)
+  love.graphics.setColor(255, 255, 255)
   for i, v in ipairs(Button) do
     if v.mouseOver then
-      love.graphics.setColor(255, 255, 255)
+      love.graphics.draw(v.spriteOver, v.x, v.y)
     else
-      love.graphics.setColor(0, 0, 0)
+      love.graphics.draw(v.spriteNormal, v.x, v.y)
     end
-    love.graphics.print(v.text, v.x, v.y)
   end
-end
-
-function ButtonSpawn(x, y, text, id)
-  table.insert(Button, {x = x, y = y, text = text, id = id, mouseOver = false} )
 end

@@ -1,12 +1,10 @@
 function CreateHero()
   Hero = {}
 
-  Hero.sprite = {}
-  table.insert(Hero.sprite, love.graphics.newImage "images/characters/red/knight_00.png")
-  table.insert(Hero.sprite, love.graphics.newImage "images/characters/red/knight_01.png")
-  table.insert(Hero.sprite, love.graphics.newImage "images/characters/red/knight_02.png")
-  table.insert(Hero.sprite, love.graphics.newImage "images/characters/red/knight_03.png")
+  CreateRed()
+  --CreateGold()
   Hero.currentSprite = 1
+  Hero.currentShieldSprite = 2
 
   Hero.width = Hero.sprite[Hero.currentSprite]:getWidth()
   Hero.height = Hero.sprite[Hero.currentSprite]:getHeight()
@@ -16,29 +14,31 @@ function CreateHero()
   Hero.count = 0
   Hero.enableMovements = true
 
-  Hero.shieldSprite = {}
-  table.insert(Hero.shieldSprite, love.graphics.newImage "images/characters/red/shield_00.png")
-  table.insert(Hero.shieldSprite, love.graphics.newImage "images/characters/red/shield_01.png")
-  table.insert(Hero.shieldSprite, love.graphics.newImage "images/characters/red/shield_02.png")
-  Hero.currentShieldSprite = 2
-
   Hero.lanceSprite = {}
-  table.insert(Hero.lanceSprite, love.graphics.newImage "images/characters/red/spear_00.png")
-  table.insert(Hero.lanceSprite, love.graphics.newImage "images/characters/red/spear_01.png")
-  table.insert(Hero.lanceSprite, love.graphics.newImage "images/characters/red/spear_02.png")
-  table.insert(Hero.lanceSprite, love.graphics.newImage "images/characters/red/spear_03.png")
+  table.insert(Hero.lanceSprite, love.graphics.newImage "images/characters/hero lance/spear_00.png")
+  table.insert(Hero.lanceSprite, love.graphics.newImage "images/characters/hero lance/spear_01.png")
+  table.insert(Hero.lanceSprite, love.graphics.newImage "images/characters/hero lance/spear_02.png")
+  table.insert(Hero.lanceSprite, love.graphics.newImage "images/characters/hero lance/spear_03.png")
   Hero.currentLanceSprite = 2
+
+  Hero.fallenSprite = love.graphics.newImage "images/characters/red/fallen.png"
 end
 
 function DrawHero()
   love.graphics.setColor(255, 255, 255)
-  if Hero.currentLanceSprite == 4 then
-    love.graphics.draw(Hero.lanceSprite[Hero.currentLanceSprite], Hero.x + Hero.width / 2, Hero.y - Hero.height / 2)
-  else
-    love.graphics.draw(Hero.lanceSprite[Hero.currentLanceSprite], Hero.x + Hero.width / 2, Hero.y + 30)
+  if Hero.lanceSprite ~= nil then
+    if Hero.currentLanceSprite == 4 then
+      love.graphics.draw(Hero.lanceSprite[Hero.currentLanceSprite], Hero.x + Hero.width / 2, Hero.y - Hero.height / 2)
+    else
+      love.graphics.draw(Hero.lanceSprite[Hero.currentLanceSprite], Hero.x + Hero.width / 2, Hero.y + 30)
+    end
   end
   love.graphics.draw(Hero.sprite[Hero.currentSprite], Hero.x, Hero.y)
-  love.graphics.draw(Hero.shieldSprite[Hero.currentShieldSprite], Hero.x + Hero.width / 2, Hero.y + 35)
+  if Hero.shieldSprite ~= nil then
+    love.graphics.draw(Hero.shieldSprite[Hero.currentShieldSprite], Hero.x + Hero.width / 2, Hero.y + 35)
+  else
+    love.graphics.draw(Hero.fallenSprite, Hero.x + Hero.width / 2, Hero.y + 35)
+  end
 end
 
 function ActionHero(key)
@@ -71,24 +71,25 @@ end
 function MoveHero(dt)
   if Hero.enableMovements then
     if  Hero.count == 10 then
-      Galop:play()
-      if Hero.currentSprite == 1 or Hero.currentSprite == 4 then
-         Hero.currentSprite = 2
-      elseif Hero.currentSprite == 2 then
-         Hero.currentSprite = 3
-      elseif Hero.currentSprite == 3 then
-         Hero.currentSprite = 4
+      if not finish then
+        Galop:play()
+      end
+      Hero.currentSprite = Hero.currentSprite + 1
+      if Hero.currentSprite > 4 then
+        Hero.currentSprite = 2
       end
       Hero.count = 0;
     end
     Hero.count = Hero.count + 1;
     Hero.x = Hero.x + Hero.speed * dt
-    if Hero.x > Width - Width / 8 - Hero.width then
+
+    if Hero.shieldSprite ~= nil and Hero.x > Width - Width / 8 - Hero.width then
       Hero.enableMovements = false
       Hero.currentLanceSprite = 4
       Hero.currentShieldSprite = 2
       Hero.currentSprite = 1
       if not finish then
+        Galop:stop()
         Ost:stop()
         VictorySound:play()
         finish = true
@@ -107,4 +108,40 @@ end
 
 function HeroLancePosition()
   return Hero.currentLanceSprite
+end
+
+function HeroFall()
+  Hero.sprite = {}
+  table.insert(Hero.sprite, love.graphics.newImage "images/characters/red/horse_00.png")
+  table.insert(Hero.sprite, love.graphics.newImage "images/characters/red/horse_01.png")
+  table.insert(Hero.sprite, love.graphics.newImage "images/characters/red/horse_02.png")
+  table.insert(Hero.sprite, love.graphics.newImage "images/characters/red/horse_03.png")
+  Hero.shieldSprite = nil
+  Hero.lanceSprite = nil
+end
+
+function CreateRed()
+  Hero.sprite = {}
+  table.insert(Hero.sprite, love.graphics.newImage "images/characters/red/knight_00.png")
+  table.insert(Hero.sprite, love.graphics.newImage "images/characters/red/knight_01.png")
+  table.insert(Hero.sprite, love.graphics.newImage "images/characters/red/knight_02.png")
+  table.insert(Hero.sprite, love.graphics.newImage "images/characters/red/knight_03.png")
+
+  Hero.shieldSprite = {}
+  table.insert(Hero.shieldSprite, love.graphics.newImage "images/characters/red/shield_00.png")
+  table.insert(Hero.shieldSprite, love.graphics.newImage "images/characters/red/shield_01.png")
+  table.insert(Hero.shieldSprite, love.graphics.newImage "images/characters/red/shield_02.png")
+end
+
+function CreateGold()
+  Hero.sprite = {}
+  table.insert(Hero.sprite, love.graphics.newImage "images/characters/gold/knight_00.png")
+  table.insert(Hero.sprite, love.graphics.newImage "images/characters/gold/knight_01.png")
+  table.insert(Hero.sprite, love.graphics.newImage "images/characters/gold/knight_02.png")
+  table.insert(Hero.sprite, love.graphics.newImage "images/characters/gold/knight_03.png")
+
+  Hero.shieldSprite = {}
+  table.insert(Hero.shieldSprite, love.graphics.newImage "images/characters/gold/shield_00.png")
+  table.insert(Hero.shieldSprite, love.graphics.newImage "images/characters/gold/shield_01.png")
+  table.insert(Hero.shieldSprite, love.graphics.newImage "images/characters/gold/shield_02.png")
 end

@@ -8,7 +8,7 @@ function love.textinput(t)
   end
 end
 
-function love.keypressed(key)
+function Backspace(key)
   if key == "backspace" then
     local byteoffset = utf8.offset(Text, -1)
     if byteoffset then
@@ -17,11 +17,10 @@ function love.keypressed(key)
   end
 end
 
-function DrawTextBox(x, y, label, text)
+function DrawTextBox()
   love.graphics.setFont(mainFont);
   love.graphics.setColor(0, 0, 0)
-  text = string.format("%s: %s", label, Text)
-  love.graphics.rectangle("line", x + mainFont:getWidth(label) + 20, y - mainFont:getHeight(label), 600, 80)
-  love.graphics.printf(text, x, y, Width)
+  love.graphics.printf(Text, 390, 360, Width)
+  love.graphics.setColor(255, 255, 255)
   return Text
 end
