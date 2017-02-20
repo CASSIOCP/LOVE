@@ -1,6 +1,5 @@
 function CreateButton()
   Button = {}
-
   table.insert(Button, { x = 400, y = 600, id = "start", mouseOver = false, spriteNormal = love.graphics.newImage "images/buttons/player_01.png", spriteOver = love.graphics.newImage "images/buttons/player_02.png" } )
   table.insert(Button, { x = 400, y = 680, id = "multiplayer", mouseOver = false, spriteNormal = love.graphics.newImage "images/buttons/multiplayer_01.png", spriteOver = love.graphics.newImage "images/buttons/multiplayer_02.png"} )
   table.insert(Button, { x = 750, y = 600, id = "tutorial", mouseOver = false, spriteNormal = love.graphics.newImage "images/buttons/tutorial_01.png", spriteOver = love.graphics.newImage "images/buttons/tutorial_02.png" } )
@@ -26,14 +25,18 @@ function ButtonClick(id)
     elseif id == "ok1" then
       State = "Story"
       CreateButtonLetter()
-    elseif id == "ok2" then
+    elseif id == "ok2" or id == "multiplayer" then
+      if id == "multiplayer" then
+        Multiplayer = true
+      end
       State = "Play"
       BgSound:stop()
-      --Ost:play()
-      startTime = love.timer.getTime()
-    elseif id == "multiplayer" then
-      id = "ok2"
-      Multiplayer = true
+      Ost:play()
+      ResetState()
+    elseif id == "credits" then
+      State = "Credits"
+    elseif id=="tutorial" then
+      State = "Tutorial"
     elseif id == "exit" then
       State = "Exit"
     end

@@ -1,8 +1,12 @@
 function CreateHero()
   Hero = {}
 
-  CreateRed()
-  --CreateGold()
+  if GoldArmor then
+    CreateGold()
+  else
+    CreateRed()
+  end
+
   Hero.currentSprite = 1
   Hero.currentShieldSprite = 2
 
@@ -20,8 +24,6 @@ function CreateHero()
   table.insert(Hero.lanceSprite, love.graphics.newImage "images/characters/hero lance/spear_02.png")
   table.insert(Hero.lanceSprite, love.graphics.newImage "images/characters/hero lance/spear_03.png")
   Hero.currentLanceSprite = 2
-
-  Hero.fallenSprite = love.graphics.newImage "images/characters/red/fallen.png"
 end
 
 function DrawHero()
@@ -37,7 +39,7 @@ function DrawHero()
   if Hero.shieldSprite ~= nil then
     love.graphics.draw(Hero.shieldSprite[Hero.currentShieldSprite], Hero.x + Hero.width / 2, Hero.y + 35)
   else
-    love.graphics.draw(Hero.fallenSprite, Hero.x + Hero.width / 2, Hero.y + 35)
+    love.graphics.draw(Hero.fallenSprite, Width / 2 - Hero.width / 2, Hero.y + 200)
   end
 end
 
@@ -83,7 +85,7 @@ function MoveHero(dt)
     Hero.count = Hero.count + 1;
     Hero.x = Hero.x + Hero.speed * dt
 
-    if Hero.shieldSprite ~= nil and Hero.x > Width - Width / 8 - Hero.width then
+    if Hero.shieldSprite ~= nil and Hero.x > Width - Width / 5 - Hero.width then
       Hero.enableMovements = false
       Hero.currentLanceSprite = 4
       Hero.currentShieldSprite = 2
@@ -93,13 +95,17 @@ function MoveHero(dt)
         Ost:stop()
         VictorySound:play()
         finish = true
+        Round = Round + 1
+        CreateButtonLetter()
       end
+    elseif Hero.shieldSprite == nil then
+      CreateButtonLetter()
     end
   end
 end
 
 function ReachCenter()
-  return Hero.x + Hero.width >= Width / 2.5
+  return Hero.x + Hero.width >= Width / 2
 end
 
 function HeroShieldPosition()
@@ -112,10 +118,17 @@ end
 
 function HeroFall()
   Hero.sprite = {}
-  table.insert(Hero.sprite, love.graphics.newImage "images/characters/red/horse_00.png")
-  table.insert(Hero.sprite, love.graphics.newImage "images/characters/red/horse_01.png")
-  table.insert(Hero.sprite, love.graphics.newImage "images/characters/red/horse_02.png")
-  table.insert(Hero.sprite, love.graphics.newImage "images/characters/red/horse_03.png")
+  if GoldArmor then
+    table.insert(Hero.sprite, love.graphics.newImage "images/characters/gold/horse_00.png")
+    table.insert(Hero.sprite, love.graphics.newImage "images/characters/gold/horse_01.png")
+    table.insert(Hero.sprite, love.graphics.newImage "images/characters/gold/horse_02.png")
+    table.insert(Hero.sprite, love.graphics.newImage "images/characters/gold/horse_03.png")
+  else
+    table.insert(Hero.sprite, love.graphics.newImage "images/characters/red/horse_00.png")
+    table.insert(Hero.sprite, love.graphics.newImage "images/characters/red/horse_01.png")
+    table.insert(Hero.sprite, love.graphics.newImage "images/characters/red/horse_02.png")
+    table.insert(Hero.sprite, love.graphics.newImage "images/characters/red/horse_03.png")
+  end
   Hero.shieldSprite = nil
   Hero.lanceSprite = nil
 end
@@ -131,6 +144,8 @@ function CreateRed()
   table.insert(Hero.shieldSprite, love.graphics.newImage "images/characters/red/shield_00.png")
   table.insert(Hero.shieldSprite, love.graphics.newImage "images/characters/red/shield_01.png")
   table.insert(Hero.shieldSprite, love.graphics.newImage "images/characters/red/shield_02.png")
+
+  Hero.fallenSprite = love.graphics.newImage "images/characters/red/fallen.png"
 end
 
 function CreateGold()
@@ -144,4 +159,6 @@ function CreateGold()
   table.insert(Hero.shieldSprite, love.graphics.newImage "images/characters/gold/shield_00.png")
   table.insert(Hero.shieldSprite, love.graphics.newImage "images/characters/gold/shield_01.png")
   table.insert(Hero.shieldSprite, love.graphics.newImage "images/characters/gold/shield_02.png")
+
+  Hero.fallenSprite = love.graphics.newImage "images/characters/gold/fallen.png"
 end

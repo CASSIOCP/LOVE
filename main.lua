@@ -1,28 +1,26 @@
 Width = love.graphics.getWidth()
 Height = love.graphics.getHeight()
-StartDuel = false
 State = "Menu"
---background = love.graphics.newImage("images/backgrounds/joust.jpg")
+
 player_name = love.graphics.newImage("images/backgrounds/player_name.png")
 letter = love.graphics.newImage("images/backgrounds/letter.png")
 background = love.graphics.newImage("images/backgrounds/screen.png")
 clash = love.graphics.newImage("images/backgrounds/clash.png")
 timerImage = love.graphics.newImage("images/backgrounds/timer.png")
+victory = love.graphics.newImage("images/backgrounds/victory.png")
+defeat = love.graphics.newImage("images/backgrounds/defeat.png")
+creditscreen = love.graphics.newImage("images/backgrounds/credits.png")
 
 mainFont = love.graphics.newFont("Oldengl.ttf", 45);
 secondFont = love.graphics.newFont("Oldengl.ttf", 32);
 normal = love.graphics.newFont(14)
 
-finish = false
-
-Round = 2
+Round = 1
 Multiplayer = false
+GoldArmor = false
+Reset = false
 
 function love.load(arg)
-  timer = 10
-  startTime = love.timer.getTime()
-
-  venceu = ""
   Name = ""
   love.graphics.setFont(mainFont);
 
@@ -34,21 +32,24 @@ function love.load(arg)
   textBox = require "textBox"
   chocolate = require "chocolate"
   sound = require "sound"
+  tutorial = require "tutorial"
 
   --Load classes
   CreateButton()
-  CreateHero()
-  CreateVillain()
-  CreateStage()
-  CreateChocolate()
-  --BgSound:play()
+  ResetState()
+  LoadTutorial(arg)
+  BgSound:play()
 end
 
 function love.update(dt)
-  if State == "Menu" or State == "Name" or State == "Story" then
-    MouseCheck()
+  MouseCheck()
+  if State == "Tutorial" then
+    TutorialUpdate(dt)
   elseif State == "Play" then
     MoveClouds(dt)
+    if not Multiplayer then
+      ComputerAI()
+    end
     if not StartDuel and (love.keyboard.isDown("space") or (love.timer.getTime() - startTime >= timer)) then
       StartDuel = true;
     elseif StartDuel then
@@ -57,13 +58,10 @@ function love.update(dt)
 
       if ReachCenter() then
         if (ms == true) then
-
           MetalSound2:play()
           ms = false;
         end
-        --if Stage. .NeedDraw then
-        --  DrawCloud()
-        --end
+
         if venceu == "" then
           if HeroLancePosition() ~= VillainShieldPosition() then
             if HeroShieldPosition() == VillainLancePosition() then
@@ -84,15 +82,10 @@ function love.update(dt)
           end
         end
       end
-
     end
   elseif State == "Exit" then
     love.event.quit(0)
   end
-
-  -- if Hero.x >= Width / 2 - Hero.width then
-  --   love.audio.play(BgSound)
-  -- end
 end
 
 function love.draw()
@@ -100,6 +93,14 @@ function love.draw()
   if State == "Menu" then
     love.graphics.draw(background)
     ButtonDraw()
+  elseif State == "Credits" then
+  	love.graphics.draw(creditscreen)
+  	love.graphics.setColor(0, 0, 0)
+    love.graphics.setFont(secondFont)
+    love.graphics.print("Pressione Enter p/ retornar", 465, 600)
+    love.graphics.setFont(mainFont)
+  elseif State == "Tutorial" then
+  	DrawTutorial()
   elseif State == "Name" then
     love.graphics.draw(player_name)
     Name = DrawTextBox(100, Height / 2, "Jogador, escreva teu nome", Name)
@@ -108,7 +109,7 @@ function love.draw()
     love.graphics.draw(letter)
     love.graphics.setColor(0, 0, 0)
     love.graphics.setFont(secondFont)
-    love.graphics.print(Name, 465, 145)
+    love.graphics.print(Name, 710 - (15 * string.len(Name)), 145)
     love.graphics.setFont(mainFont)
     ButtonDraw()
   elseif State == "Play" then
@@ -119,32 +120,26 @@ function love.draw()
     love.graphics.setColor(255, 255, 0)
     love.graphics.rectangle("fill", Width / 2, Height / 1.295, 15, 8)
     DrawHero()
-    -- if ReachCenter() and Cloud.NeedDraw then
-    --   love.graphics.draw(Cloud.sprite[Cloud.currentSprite], Width / 3.5, Height / 3)
-    --   love.graphics.draw(Cloud.sprite[Cloud.currentSprite], Width / 4, Height / 3)
-    --   love.graphics.draw(Cloud.sprite[Cloud.currentSprite], Width / 4.5, Height / 3)
-    -- end
-    --DrawChocolate()
-    love.graphics.print("HeroLancePosition: "..HeroLancePosition(), Width / 4, 30)
-    love.graphics.print("HeroShieldPosition: "..HeroShieldPosition(), Width / 4, 50)
-    love.graphics.print("VillainLancePosition: "..VillainLancePosition(), Width / 4, 70)
-    love.graphics.print("VillainShieldPosition: "..VillainShieldPosition(), Width / 4, 90)
     if ReachCenter() then
       love.graphics.print(venceu, Width / 4, 10)
-
+      if clashCount > 0 then
+        clashCount = clashCount - 1
+        love.graphics.draw(clash, 0, 0)
+      end
     end
 
-    love.graphics.setFont(mainFont)
-    if (love.timer.getTime() - startTime) <= timer then
-      love.graphics.draw(timerImage, Width - 210, 10)
-      result = string.format("%.2d", (timer - (love.timer.getTime() - startTime)))
-      love.graphics.setColor(0, 0, 0)
-      love.graphics.print(result, Width - 130, 70)
-    end
+    DrawTimer()
 
+    if finish then
+      love.graphics.setColor(255, 255, 255)
+      if venceu == "Hero ganhou" then
+        love.graphics.draw(victory, Width / 2 - victory:getWidth() / 2, 100)
+      elseif venceu == "Villain ganhou" then
+        love.graphics.draw(defeat, Width / 2 - defeat:getWidth() / 2, 100)
+      end
+      ButtonDraw()
+    end
   end
-  --love.graphics.draw(button1, Width - 300, Height - 220)
-  --love.graphics.draw(button2, Width - 300, Height - 150)
 end
 
 function ResetFont()
@@ -153,24 +148,43 @@ function ResetFont()
 end
 
 function love.keypressed(key, scancode, isrepeat)
-  if State == "Play" then
-    ActionVillain(key)
+  if State == "Play" or State == "Tutorial" then
+    if Multiplayer or State == "Tutorial" then
+      ActionVillain(key)
+    end
     ActionHero(key)
   elseif State == "Name" then
     Backspace(key)
   end
+  if State == "Credits" and key == "return" then
+	  State = "Menu"
+	end
   if key == "escape" then
     love.event.quit(0)
   end
 end
 
--- function DrawCloud()
---   if Cloud.count == 10 then
---     Cloud.currentSprite = Cloud.currentSprite + 1
---     if Cloud.currentSprite > 4 then
---        Cloud.NeedDraw = false
---     end
---     Cloud.count = 0;
---   end
---   Cloud.count = Cloud.count + 1;
--- end
+function DrawTimer()
+  love.graphics.setFont(mainFont)
+  if (love.timer.getTime() - startTime) <= timer then
+    love.graphics.draw(timerImage, Width - 210, 10)
+    result = string.format("%.2d", (timer - (love.timer.getTime() - startTime)))
+    love.graphics.setColor(0, 0, 0)
+    love.graphics.print(result, Width - 130, 70)
+  end
+end
+
+function ResetState()
+  startTime = love.timer.getTime()
+  timer = 10
+
+  StartDuel = false
+  finish = false
+  clashCount = 20
+  venceu = ""
+
+  CreateHero()
+  CreateVillain()
+  CreateStage()
+  CreateChocolate()
+end

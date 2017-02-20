@@ -24,6 +24,16 @@ function CreateVillain()
   Villain.speed = 150
   Villain.count = 0
   Villain.enableMovements = true
+  if Round == 1 then
+    Villain.randomSpeed = 500
+  elseif Round == 2 then
+    Villain.randomSpeed = 400
+  elseif Round == 3 then
+    Villain.randomSpeed = 300
+  elseif Round == 4 then
+    Villain.randomSpeed = 200
+  end
+  Villain.randomCount = Villain.randomSpeed
 end
 
 function DrawVillain()
@@ -38,11 +48,13 @@ function DrawVillain()
   love.graphics.draw(Villain.sprite[Villain.currentSprite], Villain.x, Villain.y - 30)
   if Villain.shieldSprite ~= nil then
     love.graphics.draw(Villain.shieldSprite[Villain.currentShieldSprite], Villain.x + Villain.width / 3, Villain.y + 5)
+  else
+    love.graphics.draw(Villain.fallenSprite, Width / 2 - Villain.width / 2, Villain.y + 80)
   end
 end
 
 function ActionVillain(key)
-  if Multiplayer and Villain.enableMovements then
+  if Villain.enableMovements then
     if key == "i" then
       Villain.currentLanceSprite = Villain.currentLanceSprite + 1
       if Villain.currentLanceSprite > 3 then
@@ -79,7 +91,7 @@ function MoveVillain(dt)
     end
     Villain.count = Villain.count + 1;
     Villain.x = Villain.x - Villain.speed * dt
-    if Villain.shieldSprite ~= nil and Villain.x < Width / 8 then
+    if Villain.shieldSprite ~= nil and Villain.x < Width / 5 then
       Villain.enableMovements = false
       Villain.currentLanceSprite = 4
       Villain.currentShieldSprite = 2
@@ -89,6 +101,7 @@ function MoveVillain(dt)
         Galop:stop()
         DefeatSound:play()
         finish = true
+        Round = 1
       end
     end
   end
@@ -104,10 +117,17 @@ end
 
 function VillainFall()
   Villain.sprite = {}
-  table.insert(Villain.sprite, love.graphics.newImage "images/characters/blue/horse_00.png")
-  table.insert(Villain.sprite, love.graphics.newImage "images/characters/blue/horse_01.png")
-  table.insert(Villain.sprite, love.graphics.newImage "images/characters/blue/horse_02.png")
-  table.insert(Villain.sprite, love.graphics.newImage "images/characters/blue/horse_03.png")
+  if Round == 1 then
+    table.insert(Villain.sprite, love.graphics.newImage "images/characters/blue/horse_00.png")
+    table.insert(Villain.sprite, love.graphics.newImage "images/characters/blue/horse_01.png")
+    table.insert(Villain.sprite, love.graphics.newImage "images/characters/blue/horse_02.png")
+    table.insert(Villain.sprite, love.graphics.newImage "images/characters/blue/horse_03.png")
+  elseif Round == 2 then
+    table.insert(Villain.sprite, love.graphics.newImage "images/characters/dark/horse_00.png")
+    table.insert(Villain.sprite, love.graphics.newImage "images/characters/dark/horse_01.png")
+    table.insert(Villain.sprite, love.graphics.newImage "images/characters/dark/horse_02.png")
+    table.insert(Villain.sprite, love.graphics.newImage "images/characters/dark/horse_03.png")
+  end
   Villain.shieldSprite = nil
   Villain.lanceSprite = nil
 end
@@ -124,7 +144,7 @@ function CreateBlue()
   table.insert(Villain.shieldSprite, love.graphics.newImage "images/characters/blue/shield_01.png")
   table.insert(Villain.shieldSprite, love.graphics.newImage "images/characters/blue/shield_02.png")
 
-  Hero.fallenSprite = love.graphics.newImage "images/characters/blue/fallen.png"
+  Villain.fallenSprite = love.graphics.newImage "images/characters/blue/fallen.png"
 end
 
 function CreateDark()
@@ -139,5 +159,16 @@ function CreateDark()
   table.insert(Villain.shieldSprite, love.graphics.newImage "images/characters/dark/shield_01.png")
   table.insert(Villain.shieldSprite, love.graphics.newImage "images/characters/dark/shield_02.png")
 
-  Hero.fallenSprite = love.graphics.newImage "images/characters/dark/fallen.png"
+  Villain.fallenSprite = love.graphics.newImage "images/characters/dark/fallen.png"
+end
+
+function ComputerAI()
+  if Villain.enableMovements then
+    if Villain.randomCount > Villain.randomSpeed then
+      Villain.currentLanceSprite = math.random(1, 3)
+      Villain.currentShieldSprite = math.random(1, 3)
+      Villain.randomCount = 0
+    end
+    Villain.randomCount = Villain.randomCount + 1
+  end
 end
